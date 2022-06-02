@@ -39,11 +39,17 @@ private:
 
   int m_width, m_height;
 
+  int temp_time = -1;
+
+  bool move = true;
+
+  bool test = true;
+
 public:
 
   static const int ENEMY_VEL = 320;
 
-  static const int VIEW_DISTANCE = 20;
+  static const int VIEW_DISTANCE = 50;
 
   void tempPathFinder( int player_posx, int player_posy, float *time_step, Screen *screen, Enemy m_enemies[], int size);
   void tempEnemyRender( SDL_Renderer *renderer, Texture *enemy_texture );

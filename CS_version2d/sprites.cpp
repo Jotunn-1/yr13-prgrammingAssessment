@@ -4,8 +4,8 @@
 
 //account for size of characters later
 std::default_random_engine generator;
-std::uniform_int_distribution<int> distribution(500, 550);
-std::uniform_int_distribution<int> distribution2(400, 450);
+std::uniform_int_distribution<int> distribution(100, 540);
+std::uniform_int_distribution<int> distribution2(100, 380);
 
 void Player::getDimensions( Texture *texture )
 {
@@ -93,16 +93,12 @@ void Enemy::tempPathFinder( int player_posx, int player_posy, float *time_step, 
   float vector = hypotf( direction_x, direction_y );
 
   // avoid clumping
-  float total_x_pos;
-  float total_y_pos;
+  float total_x_pos = 0;
+  float total_y_pos = 0;
   for( int i = 0; i < size; i++ )
   {
-    // float distance = ( pow( ( player_posx - m_enemies[i].m_posx ), 2 ) + ( pow( ( player_posy - m_enemies[i].m_posy ), 2) ) );
-    // if( distance < pow( VIEW_DISTANCE, 2 ) )
-    // {
       total_x_pos += m_enemies[i].m_posx;
       total_y_pos += m_enemies[i].m_posy;
-    // }
   }
 
   total_x_pos /= size;
@@ -113,39 +109,79 @@ void Enemy::tempPathFinder( int player_posx, int player_posy, float *time_step, 
 
   float vector_com = hypotf( distance_com_x, distance_com_y );
 
-  //
-  // float angle = atan(y_legnth/x_legnth);
-  // float magnitude = 1;
-  // float delta_x = magnitude * sin(angle);
-  // float delta_y = magnitude * cos(angle);
-  //
-  // std::cout << delta_x <<", "<< delta_y <<"\n";
-  //
-  // m_posx -= delta_x;
-  // m_posy -= delta_y;
-
-//  std::cout<< "x-" << total_x_pos << std::endl;
-
-  if( vector > 0 && vector_com > VIEW_DISTANCE )
+  if( vector > 0 )
   {
+    if( move )
+    {
     float vector_x = direction_x / vector;
     float vector_y = direction_y / vector;
 
     m_posx += ( vector_x * ENEMY_VEL ) * *time_step;
     m_posy += ( vector_y * ENEMY_VEL ) * *time_step;
-
+    }
   }
+
+  // if( vector_com < VIEW_DISTANCE )
+  // {
+  //   if( last_move == -1 )
+  //   {
+  //     last_move = SDL_GetTicks();
+  //     std::cout <<"----"<< last_move << std::endl;
+  //   }
+  //
+  //   if( vector_com < )
+  //   {
+  //     move = false;
+  //     float test_vector_x = ( distance_com_x / vector_com ) * -1;
+  //     float test_vector_y = ( distance_com_y / vector_com ) * -1;
+  //
+  //     m_posx += ( test_vector_x * ENEMY_VEL ) * *time_step;
+  //     m_posy += ( test_vector_y * ENEMY_VEL ) * *time_step;
+  //   }
+  //   else if( SDL_GetTicks() > ( last_move + 2000) )
+  //   {
+  //     move = true;
+  //     last_move = -1;
+  //   }
+  // }
+
+  // std::cout << "1 " << test << std::endl;
 
   if( vector_com < VIEW_DISTANCE )
   {
-    float test_vector_x = ( distance_com_x / vector_com ) * -1;
-    float test_vector_y = ( distance_com_y / vector_com ) * -1;
+    if( test )
+    {
+      // std::cout << test << std::endl;
+      move = false;
+      float test_vector_x = ( distance_com_x / vector_com ) * -1;
+      float test_vector_y = ( distance_com_y / vector_com ) * -1;
 
-    m_posx += ( test_vector_x * ENEMY_VEL ) * *time_step;
-    m_posy += ( test_vector_y * ENEMY_VEL ) * *time_step;
+      m_posx += ( test_vector_x * ENEMY_VEL ) * *time_step;
+      m_posy += ( test_vector_y * ENEMY_VEL ) * *time_step;
+    }
   }
 
-  std::cout << "time" << SDL_GetTicks()/1000 << std::endl;
+  // std::cout << "2 " << test << std::endl;
+
+  // std::cout << "COM " << vector_com << std::endl;
+  // std::cout << "VIEW DISTANCE " << VIEW_DISTANCE << std::endl;
+
+  if( vector_com > VIEW_DISTANCE )
+  {
+    test = false;
+    move = true;
+
+    if( temp_time = -1 )
+    {
+      temp_time = SDL_GetTicks();
+    }
+  }
+
+  if( SDL_GetTicks() > ( temp_time + 500 ) )
+  {
+    test = true;
+    temp_time = -1;
+  }
 
   // if( m_posx < 0 )
   // {
