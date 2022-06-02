@@ -43,7 +43,9 @@ public:
 
   static const int ENEMY_VEL = 320;
 
-  void tempPathFinder( int player_posx, int player_posy, float *time_step, Screen *screen );
+  static const int VIEW_DISTANCE = 20;
+
+  void tempPathFinder( int player_posx, int player_posy, float *time_step, Screen *screen, Enemy m_enemies[], int size);
   void tempEnemyRender( SDL_Renderer *renderer, Texture *enemy_texture );
   void coords( Screen *screen );
   void pos();
@@ -53,7 +55,7 @@ public:
 class Enemies
 {
 public:
-  static const int N_ENEMIES = 10;
+  static const int N_ENEMIES = 8;
 
 private:
   Enemy *m_enemies;
