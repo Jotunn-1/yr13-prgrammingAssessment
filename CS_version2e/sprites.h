@@ -23,6 +23,8 @@ private:
   float m_velx, m_vely;
   float m_posx, m_posy;
 
+  float temp_velx, temp_vely;
+
   int m_width, m_height;
   const int HIT_BOXES = 1;
 
@@ -34,8 +36,8 @@ public:
   Player();
   virtual ~Player();
 
-  int getPosx();
-  int getPosy();
+  float getPosx();
+  float getPosy();
 
   void getDimensions( Texture *texture );
   void moveEvent( SDL_Event &event );
@@ -44,6 +46,7 @@ public:
   std::vector<SDL_Rect> getHitBox();
   //debug
   void printHitBox();
+  void collisionShift();
 };
 
 class Enemy

@@ -17,12 +17,12 @@ Player::~Player()
   delete [] hit_box;
 }
 
-int Player::getPosx()
+float Player::getPosx()
 {
   return m_posx;
 }
 
-int Player::getPosy()
+float Player::getPosy()
 {
   return m_posy;
 }
@@ -41,27 +41,29 @@ void Player::moveEvent( SDL_Event &event )
 
     switch( event.key.keysym.sym )
     {
-      case SDLK_w: m_vely -= VEL; break;
-      case SDLK_s: m_vely += VEL; break;
-      case SDLK_a: m_velx -= VEL; break;
-      case SDLK_d: m_velx += VEL; break;
+      case SDLK_w: temp_vely -= VEL; break;
+      case SDLK_s: temp_vely += VEL; break;
+      case SDLK_a: temp_velx -= VEL; break;
+      case SDLK_d: temp_velx += VEL; break;
     }
   }
   else if( event.type == SDL_KEYUP && event.key.repeat == 0 )
   {
     switch( event.key.keysym.sym )
     {
-      case SDLK_w: m_vely += VEL; break;
-      case SDLK_s: m_vely -= VEL; break;
-      case SDLK_a: m_velx += VEL; break;
-      case SDLK_d: m_velx -= VEL; break;
+      case SDLK_w: temp_vely += VEL; break;
+      case SDLK_s: temp_vely -= VEL; break;
+      case SDLK_a: temp_velx += VEL; break;
+      case SDLK_d: temp_velx -= VEL; break;
     }
   }
 }
 
-void Player::move( float *time_step, Screen *screen )
+void Player::move( float *time_step, Screen *screen)
 {
-  m_posx += m_velx * *time_step;
+
+  m_velx =  temp_velx * *time_step;;
+  m_posx += m_velx;
   hit_box[0].shiftColliders( m_posx, m_posy );
 
   if( m_posx < 0 )
@@ -73,7 +75,8 @@ void Player::move( float *time_step, Screen *screen )
     m_posx = screen->SCREEN_WIDTH - m_width;
   }
 
-  m_posy += m_vely * *time_step;
+  m_vely = temp_vely * *time_step;
+  m_posy += m_vely;
   hit_box[0].shiftColliders( m_posx, m_posy );
 
   if( m_posy < 0 )
@@ -98,7 +101,17 @@ std::vector<SDL_Rect> Player::getHitBox()
 
 void Player::printHitBox()
 {
+  std::cout << "player" << std::endl;
   hit_box[0].HitBox();
+  std::cout << "x - " << m_posx << std::endl;
+  std::cout << "y - " << m_posy << std::endl;
+  std::cout << " " << std::endl;
+}
+
+void Player::collisionShift()
+{
+  m_posx -= m_velx/2;
+  m_posy -= m_vely/2;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -134,8 +147,6 @@ void Enemy::getEnemyDimensions( Texture *texture )
 
 void Enemy::pathFinder( int player_posx, int player_posy, float *time_step, Screen *screen, Enemy m_enemies[], int size, Player *player )
 {
-
-  printHitBox();
 
   std::vector<SDL_Rect> hit_box_a = player->getHitBox();
 
@@ -236,6 +247,9 @@ void Enemy::pathFinder( int player_posx, int player_posy, float *time_step, Scre
   {
     m_posx -= m_velx;
     m_posy -= m_vely;
+    // player->collisionShift();
+
+    // player->collisionShift();
     hit_box[0].shiftColliders( m_posx, m_posy );
   }
 }
@@ -248,7 +262,11 @@ void Enemy::enemyRenderer( SDL_Renderer *renderer, Texture *enemy_texture )
 
 void Enemy::printHitBox()
 {
+  std::cout << "enemy" << std::endl;
   hit_box[0].HitBox();
+  std::cout << "x - " << m_posx << std::endl;
+  std::cout << "y - " << m_posy << std::endl;
+  std::cout << " " << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -347,11 +365,22 @@ bool Collisions::checkCollisions( std::vector<SDL_Rect> &hit_box_a )
   top_a = m_collider[0].y;
   top_b = hit_box_a[0].y;
 
-  bottom_a = m_collider[0].x + m_collider[0].h;
+  bottom_a = m_collider[0].y + m_collider[0].h;
   bottom_b = hit_box_a[0].y + hit_box_a[0].h;
+
+  // std::cout << left_a << std::endl;
+  // std::cout << left_b << std::endl;
+  // std::cout << right_a << std::endl;
+  // std::cout << right_b << std::endl;
+  // std::cout << top_a << std::endl;
+  // std::cout << top_b << std::endl;
+  // std::cout << bottom_a << std::endl;
+  // std::cout << bottom_b << std::endl;
+  // std::cout << "" << std::endl;
 
   if( ( ( bottom_a <= top_b ) || ( top_a >= bottom_b ) || ( right_a <= left_b ) || ( left_a >= right_b ) ) == false )
   {
+    // std::cout<< "collide" <<std::endl;
     return true;
   }
 
