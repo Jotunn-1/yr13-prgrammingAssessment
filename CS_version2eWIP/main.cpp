@@ -80,8 +80,6 @@ int main( int argc, char* args[] )
     {
       SDL_Delay( screen.SCREEN_TICKS_PER_FRAME - frame_ticks );
     }
-
-    std::cout << "loop" << std::endl;
   }
 
   screen.close();

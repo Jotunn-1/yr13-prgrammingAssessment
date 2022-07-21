@@ -39,6 +39,9 @@ public:
   float getPosx();
   float getPosy();
 
+  float getVelx();
+  float getVely();
+
   void getDimensions( Texture *texture );
   void moveEvent( SDL_Event &event );
   void move( float *time_step, Screen *screen );
@@ -46,7 +49,8 @@ public:
   SDL_Rect getHitBox();
   //debug
   void printHitBox();
-  void collisionShift( int test );
+  void collisionShift();
+  void collisionPush( float enemy_velx, float enemy_vely );
 };
 
 class Enemy
@@ -57,6 +61,7 @@ private:
 
   float m_posx, m_posy;
   float m_velx, m_vely;
+  float temp_posx, temp_posy;
 
   int m_width, m_height;
   int disperse_cooldown = -1;
@@ -68,7 +73,7 @@ private:
 
 public:
 
-  static const int ENEMY_VEL = 320;
+  static const int ENEMY_VEL = 260;
 
   static const int VIEW_DISTANCE = 100;
 
@@ -113,7 +118,11 @@ private:
 
 public:
 
-  int test;
+  bool temp_check = false;
+  bool collided_top = NULL;
+  bool collided_bottom= NULL;
+  bool collided_left = NULL;
+  bool collided_right = NULL;
 
   Collisions();
 

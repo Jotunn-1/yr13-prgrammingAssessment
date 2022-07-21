@@ -27,6 +27,16 @@ float Player::getPosy()
   return m_posy;
 }
 
+float Player::getVelx()
+{
+  return m_velx;
+}
+
+float Player::getVely()
+{
+  return m_vely;
+}
+
 void Player::getDimensions( Texture *texture )
 {
   m_width = texture->get_width();
@@ -108,10 +118,20 @@ void Player::printHitBox()
   std::cout << " " << std::endl;
 }
 
-void Player::collisionShift( int test )
+void Player::collisionShift()
 {
-  m_posx -= ( m_velx + ( -1 * test ) );
-  m_posy -= ( m_vely + ( -1 * test ) );
+  m_posx -=  m_velx;
+  m_posy -=  m_vely;
+
+  hit_box->shiftColliders( m_posx, m_posy );
+}
+
+void Player::collisionPush( float enemy_velx, float enemy_vely )
+{
+  m_posx += enemy_velx/3;
+  m_posy += enemy_vely/3;
+
+  hit_box->shiftColliders( m_posx, m_posy );
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -119,6 +139,8 @@ void Player::collisionShift( int test )
 Enemy::Enemy()
 {
   hit_box = new Collisions[HIT_BOXES];
+  temp_posx = 0;
+  temp_posy = 0;
 }
 
 Enemy::~Enemy()
@@ -244,20 +266,54 @@ void Enemy::pathFinder( int player_posx, int player_posy, float *time_step, Scre
     m_posy = screen->SCREEN_HEIGHT - m_height;
   }
 
-  // std::cout << " x - " << m_velx << std::endl;
-  // std::cout << " y - " << m_vely << std::endl;
+  if( !hit_box->temp_check )
+  {
+    temp_posx = m_posx;
+    temp_posy = m_posy;
+  }
 
   if( hit_box->checkCollisions( &hit_box_a ) )
   {
 
-    // m_posx -= ( m_velx + hit_box->test );
-    // m_posy -= ( m_vely + hit_box->test );
-    // player->collisionShift( hit_box->test );
-    // player->collisionShift();
+    if( hit_box->collided_top )
+    {
+      m_posy -= m_vely/3;
+    }
+    if( hit_box->collided_bottom )
+    {
+      m_posy -= m_vely/3;
+    }
+    if( hit_box->collided_right)
+    {
+      m_posx -= m_velx/3;
+    }
+    if( hit_box->collided_left )
+    {
+      m_posx -= m_velx/3;
+    }
+
+    hit_box->temp_check = true;
 
     // player->collisionShift();
+
+    // m_posx = temp_posx;
+    // m_posy = temp_posy;
+
+    player->collisionPush( m_velx, m_vely );
+
+    m_posx += player->getVelx();
+    m_posy += player->getVely();
 
     hit_box->shiftColliders( m_posx, m_posy );
+  }
+
+  if( !hit_box->checkCollisions( &hit_box_a ) )
+  {
+    // hit_box->temp_check = false;
+    hit_box->collided_top = false;
+    hit_box->collided_left = false;
+    hit_box->collided_right = false;
+    hit_box->collided_bottom = false;
   }
 }
 
@@ -375,114 +431,47 @@ void Collisions::HitBox()
 
 bool Collisions::checkCollisions( SDL_Rect *hit_box_a )
 {
-  // int left_a, left_b;
-  // int right_a, right_b;
-  // int top_a, top_b;
-  // int bottom_a, bottom_b;
-  //
-  // left_a = m_collider.x;
-  // left_b = hit_box_a->x;
-  //
-  // right_a = m_collider.x + m_collider.w;
-  // right_b = hit_box_a->x + hit_box_a->w;
-  //
-  // top_a = m_collider.y;
-  // top_b = hit_box_a->y;
-  //
-  // bottom_a = m_collider.y + m_collider.h;
-  // bottom_b = hit_box_a->y + hit_box_a->h;
+  int left_a, left_b;
+  int right_a, right_b;
+  int top_a, top_b;
+  int bottom_a, bottom_b;
 
-  // std::cout << left_a << std::endl;
-  // std::cout << left_b << std::endl;
-  // std::cout << right_a << std::endl;
-  // std::cout << right_b << std::endl;
-  // std::cout << top_a << std::endl;
-  // std::cout << top_b << std::endl;
-  // std::cout << bottom_a << std::endl;
-  // std::cout << bottom_b << std::endl;
-  // std::cout << "" << std::endl;
+  left_a = m_collider.x;
+  left_b = hit_box_a->x;
 
-  // if( ( bottom_a == top_b ) || ( top_a == bottom_b ) || ( right_a == left_b ) || ( left_a == right_b ) )
-  // {
-  //
-  //   if( ( bottom_a <= top_b ) == false )
-  //   {
-  //     test = -1;
-  //     std::cout<< "1" << std::endl;
-  //   }
-  //
-  //   if( ( top_a >= bottom_b ) == false )
-  //   {
-  //     test = 1;
-  //     std::cout<< "2" << std::endl;
-  //   }
-  //
-  //   if( ( right_a <= left_b ) == false )
-  //   {
-  //     test = -1;
-  //     std::cout<< "3" << std::endl;
-  //   }
-  //
-  //   if( ( left_a >= right_b ) == false )
-  //   {
-  //     test = 1;
-  //     std::cout<< "4" << std::endl;
-  //   }
-  //   // std::cout<< "collide" <<std::endl;
-  //   return true;
-  // }
+  right_a = m_collider.x + m_collider.w;
+  right_b = hit_box_a->x + hit_box_a->w;
 
-  if( SDL_HasIntersection( &m_collider, hit_box_a ) )
+  top_a = m_collider.y;
+  top_b = hit_box_a->y;
+
+  bottom_a = m_collider.y + m_collider.h;
+  bottom_b = hit_box_a->y + hit_box_a->h;
+
+  if( bottom_a >= top_b && right_a >= left_b && left_a <= right_b && top_a <= bottom_b )
   {
-    // if( bottom_a > top_b )
-    // {
-    //   test = -1;
-    //   std::cout<< "1" << std::endl;
-    // }
-    //
-    // if( top_a < bottom_b )
-    // {
-    //   test = 1;
-    //   std::cout<< "2" << std::endl;
-    // }
-    //
-    // if( right_a > left_b )
-    // {
-    //   test = -1;
-    //   std::cout<< "3" << std::endl;
-    // }
-    //
-    // if( left_a < right_b )
-    // {
-    //   test = 1;
-    //   std::cout<< "4" << std::endl;
-    // }
-
-    // if( m_collider.y > hit_box_a->y )
-    // {
-    //   test = -1;
-    //   std::cout<< "1" << std::endl;
-    // }
-    //
-    // if( m_collider.y < hit_box_a->y )
-    // {
-    //   test = 1;
-    //   std::cout<< "2" << std::endl;
-    // }
-    //
-    // if( m_collider.x > hit_box_a->x )
-    // {
-    //   test = -1;
-    //   std::cout<< "3" << std::endl;
-    // }
-    //
-    // if( m_collider.x < hit_box_a->x )
-    // {
-    //   test = 1;
-    //   std::cout<< "4" << std::endl;
-    // }
-    // std::cout<< "collide" <<std::endl;
-
+    std::cout << "collision detected" << std::endl;
+    if( bottom_a >= top_b )
+    {
+      std::cout << "1" << std::endl;
+      collided_top = true;
+    }
+    if( right_a >= left_b )
+    {
+      std::cout << "2" << std::endl;
+      collided_left = true;
+    }
+    if( left_a <= right_b )
+    {
+      std::cout << "3" << std::endl;
+      collided_right = true;
+    }
+    if( top_a <= bottom_b )
+    {
+      std::cout << "4" << std::endl;
+      collided_bottom = true;
+    }
+    std::cout << "done" << std::endl;
     return true;
   }
 
