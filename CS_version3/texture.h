@@ -1,4 +1,4 @@
-//Johnathan Regha-Dodge: CS_version2/texture.h
+//Johnathan Regha-Dodge: CS_version3/texture.h
 //Texture class
 
 #ifndef TEXTURE_H

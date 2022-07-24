@@ -1,5 +1,5 @@
-//Johnathan Regha-Dodge: CS_version2/texture.cpp
-//Class methods for Texture class
+//Johnathan Regha-Dodge: CS_version5/texture.cpp
+//Class methods for texture class
 
 #include "texture.h"
 

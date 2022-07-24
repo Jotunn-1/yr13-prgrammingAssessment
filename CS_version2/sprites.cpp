@@ -1,8 +1,16 @@
-//Class methods: sprites.cpp
+//Johnathan Regha-Dodge: CS_version2/sprites.cpp
+//Class methods for the sprite class
+
 #include "sprites.h"
 
-//Class method moveEvent
-void Player::moveEvent( SDL_Event& event )
+void Player::getDimensions( Texture *player_texture )
+{
+  m_width = player_texture->get_width();
+  m_height = player_texture->get_height();
+
+}
+
+void Player::moveEvent( SDL_Event &event )
 {
 
   if( event.type == SDL_KEYDOWN && event.key.repeat == 0 )
@@ -28,31 +36,34 @@ void Player::moveEvent( SDL_Event& event )
   }
 }
 
-//Class method move
-void Player::move()
+void Player::move( float *time_step, Screen *screen )
 {
 
-  m_posx += m_velx;
+  m_posx += m_velx * *time_step;
 
-
-  //If statement stops player from moving off screen
-  if( ( m_posx + m_width ) > 640 )
+  if( m_posx < 0 )
   {
-    m_posx -= m_velx;
+    m_posx = 0;
+  }
+  else if( m_posx > screen->SCREEN_WIDTH - m_width )
+  {
+    m_posx = screen->SCREEN_WIDTH - m_width;
   }
 
-  m_posy += m_vely;
+  m_posy += m_vely * *time_step;
 
-  //If statement stops player from moving off screen
-  if( ( m_posy + m_height ) > 480 )
+  if( m_posy < 0 )
   {
-    m_posy -= m_vely;
+    m_posy = 0;
   }
-
+  else if( m_posy > screen->SCREEN_HEIGHT - m_height )
+  {
+    m_posy = screen->SCREEN_HEIGHT - m_height;
+  }
 
 }
 
-void Player::renderTest( SDL_Renderer *renderer, Texture *player_texture )
+void Player::tempRenderName( SDL_Renderer *renderer, Texture *player_texture )
 {
-  player_texture->render( renderer, m_posx, m_posy );
+  player_texture->render( renderer, (int)m_posx, (int)m_posy );
 }

@@ -1,4 +1,4 @@
-//Johnathan Regha-Dodge: CS_version2/screen.h
+//Johnathan Regha-Dodge: CS_version3/screen.h
 //Screen class
 
 #ifndef SCREEN_H
@@ -10,14 +10,15 @@
 #include "src/include/SDL2/SDL_image.h"
 
 class Player;
+class Enemy;
 
 class Screen
 {
 
 public:
 
-  const int SCREEN_WIDTH = 1920;
-  const int SCREEN_HEIGHT = 1080;
+  const int SCREEN_WIDTH = 640;
+  const int SCREEN_HEIGHT = 480;
   const int SCREEN_FPS = 60;
 
   const int SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
@@ -36,11 +37,11 @@ public:
 
   bool init();
 
-  bool loadMedia(  Texture *texture, Texture *texture_2 );
+  bool loadMedia(  Texture *texture, Texture *texture_2, Texture *texture_3 );
 
   int fpsCalc( int counted_frames );
 
-  void renderSeq( Player *player, Texture *texture, Texture *texture_2 );
+  void renderSeq( Player *player, Enemy *enemy, Texture *texture, Texture *texture_2, Texture *texture_3 );
 
   void close();
 

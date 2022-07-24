@@ -1,4 +1,4 @@
-//Johnathan Regha-Dodge: CS_version2/screen.cpp
+//Johnathan Regha-Dodge: CS_version3/screen.cpp
 //Class methods for the screen class
 
 #include "screen.h"
@@ -52,7 +52,7 @@ bool Screen::init()
   return success;
 }
 
-bool Screen::loadMedia( Texture *texture, Texture *texture_2 )
+bool Screen::loadMedia( Texture *texture, Texture *texture_2, Texture *texture_3 )
 {
 
   bool success = true;
@@ -65,6 +65,11 @@ bool Screen::loadMedia( Texture *texture, Texture *texture_2 )
     success = false;
   }
   if( !texture_2->loadFromFile( m_renderer, "assets/background.png" ) )
+  {
+    std::cout << "background image failed to load " << static_cast< std::string >( SDL_GetError() );
+    success = false;
+  }
+  if( !texture_3->loadFromFile( m_renderer, "assets/enemy.png" ) )
   {
     std::cout << "background image failed to load " << static_cast< std::string >( SDL_GetError() );
     success = false;
@@ -84,13 +89,15 @@ int Screen::fpsCalc( int counted_frames )
   return fps;
 }
 
-void Screen::renderSeq( Player *player, Texture *texture, Texture *texture_2 )
+void Screen::renderSeq( Player *player, Enemy *enemy, Texture *texture, Texture *texture_2, Texture *texture_3 )
 {
   SDL_RenderClear( m_renderer );
 
   texture_2->render( m_renderer, 0, 0 );
 
   player->tempRenderName( m_renderer, texture);
+
+  enemy->tempEnemyRender( m_renderer, texture_3);
 
   SDL_RenderPresent( m_renderer );
 }

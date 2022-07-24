@@ -1,34 +1,31 @@
-//Class: sprites.h
+//Johnathan Regha-Dodge: CS_version2/sprites.h
+//Sprite class
+
 #ifndef SPRITES_H
 #define SPRITES_H
 
 #include <iostream>
-#include "texture.cpp"
+#include "texture.h"
+#include "screen.h"
 #include "src/include/SDL2/SDL.h"
 
 class Player
 {
 private:
 
-  //Velocity declaration
-  int m_velx, m_vely;
+  float m_velx, m_vely;
+  float m_posx, m_posy;
 
-  int m_posx, m_posy;
-
-  //Dimensions declaration
-  int m_width = 20;
-  int m_height = 40;
+  int m_width, m_height;
 
 public:
 
-  //Static variables are class specific not object specific
-  static const int VEL = 10;
+  static const int VEL = 640;
 
-  void renderTest( SDL_Renderer *renderer, Texture *player_texture );
-
-  //Player class method prototypes
-  void moveEvent( SDL_Event& event );
-  void move();
+  void getDimensions( Texture *player_texture );
+  void moveEvent( SDL_Event &event );
+  void move( float *time_step, Screen *screen );
+  void tempRenderName( SDL_Renderer *renderer, Texture *player_texture);
 
 };
 

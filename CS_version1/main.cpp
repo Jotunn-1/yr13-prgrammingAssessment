@@ -1,114 +1,40 @@
-//Johnathan Regha-Dodge: CS_version1
+//Johnathan Regha-Dodge: CS_version1/main.cpp
+//Main file of the project
 
+//imports
 #include <limits>
 #include "sprites.cpp"
+#include "screen.cpp"
+#include "load_media.cpp"
 
+//Screen object
+Screen screen;
 
-//Screen dimensions
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+//Player object
+Player player;
 
-//Starts up SDL and creates Window
-bool init();
+//Media object
+LoadMedia media;
 
-//Loads Media
-bool loadMedia();
+//Background pos rect (temp)
+SDL_Rect background_pos;
 
-//Close SDL window
-void close();
+int countedFrames = 0;
 
-//window to render to
-SDL_Window* window = NULL;
-
-SDL_Surface *screen = NULL;
-
-SDL_Surface *player = NULL;
-
-SDL_Surface *background = NULL;
-
-Player mPlayer;
-
-SDL_Rect backgroundPos;
-
-bool init()
-{
-
-  bool success = true;
-
-  std::cout << "Initializing" << std::endl;
-
-  //SDL_Init returns -1 if an error occurs, function below to check for error
-  if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-  {
-    std::cout << "Initialization failed " << static_cast< std::string >( SDL_GetError() );
-    success = false;
-  }
-
-    //Assigning parameters to  create window
-    window = SDL_CreateWindow( "CS_version1", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-
-    if( window == NULL )
-    {
-      std::cout << "Window could not be created " << static_cast< std::string >( SDL_GetError() );
-      success = false;
-    }
-
-    //Get window surface
-    screen = SDL_GetWindowSurface( window );
-
-    return success;
-}
-
-
-bool loadMedia()
-{
-
-  bool success = true;
-
-  std::cout << "Loading media" << std::endl;
-
-  player = SDL_LoadBMP( "player.bmp" );
-  background = SDL_LoadBMP( "background.bmp" );
-
-  if( player == NULL || background == NULL )
-  {
-    std::cout << "Media could not be loaded " << static_cast< std::string >( SDL_GetError() ) << std::endl ;
-    success = false;
-  }
-
-  return success;
-}
-
-void close()
-{
-  std::cout << "Closing" << std::endl;
-
-  //Deallocate surface
-  SDL_FreeSurface( player );
-  player = NULL;
-  SDL_FreeSurface( background );
-  background = NULL;
-
-  //Destroy window
-  SDL_DestroyWindow( window );
-  window = NULL;
-
-  //Quits SDL
-  SDL_Quit();
-}
-
+// main function
 int main( int argc, char* args[] )
 {
 
-  if( !init() )
+  //Checking to see if screen initialized
+  if( !screen.init() )
   {
     std::cout << "Initialization failed " << static_cast< std::string >( SDL_GetError() );
 
   }
   else
   {
-    //Load Media
-    if( !loadMedia() )
+    //Checking to see if media initialized
+    if( !media.loadMedia() )
     {
       std::cout << "media failed " << static_cast< std::string >( SDL_GetError() ) << std::endl;
 
@@ -116,42 +42,59 @@ int main( int argc, char* args[] )
     else
     {
 
-      backgroundPos.x = 0;
-      backgroundPos.y = 0;
-      backgroundPos.w = 640;
-      backgroundPos.h = 480;
+      //Background pos rect, setting variables (temp)
+      background_pos.x = 0;
+      background_pos.y = 0;
+      background_pos.w = 640;
+      background_pos.h = 480;
 
-
-      // Main loop flag
+      //Main loop flag
       bool quit = false;
 
+      //Event information
       SDL_Event event;
 
+      //Main loop
       while( !quit )
       {
 
-        SDL_BlitSurface(background, NULL, screen, &backgroundPos);
-        SDL_BlitSurface(player, NULL, screen, &mPlayer.playerPos);
+        int start = SDL_GetTicks();
 
-        SDL_UpdateWindowSurface( window );
+        int fps = screen.fpsCalc( countedFrames );
+        std::cout << fps << std::endl;
 
+        //Checking for events
         while( SDL_PollEvent( &event ) !=0 )
         {
-
+          //If the caught event is SDL_QUIT then quit is true
           if( event.type == SDL_QUIT )
           {
             quit = true;
           }
 
-          mPlayer.moveEvent( event );
+          //Player move event class method
+          player.moveEvent( event );
         }
 
-        mPlayer.move();
+        //Player movement class method
+        player.move();
+
+        //Screen blit class method
+        screen.blit( media.m_background, media.m_player, background_pos, player.rect );
+        ++countedFrames;
+
+        // Capping frames to SCREEN_TICKS_PER_FRAME
+        int frameTicks = ( start - SDL_GetTicks() );
+        if( frameTicks < screen.SCREEN_TICKS_PER_FRAME )
+        {
+          SDL_Delay( screen.SCREEN_TICKS_PER_FRAME );
+        }
       }
     }
   }
 
-  close();
+  //Screen close class method
+  screen.close( media.m_background, media.m_player );
 
   //Console closes once program ends or error occurs, code used to keep it open
   /*

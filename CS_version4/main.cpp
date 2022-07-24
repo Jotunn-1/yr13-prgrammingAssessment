@@ -1,4 +1,4 @@
-//Johnathan Regha-Dodge: CS_version2/main.cpp
+//Johnathan Regha-Dodge: CS_version4/main.cpp
 //Main file of the project
 
 #include <iostream>
@@ -15,7 +15,10 @@ Screen screen;
 
 Player player;
 
+Enemies enemies;
+
 Texture player_texture;
+Texture enemy_texture;
 Texture background;
 
 int counted_frames = 0;
@@ -28,23 +31,26 @@ int main( int argc, char* args[] )
     std::cout << "Initialization failed " << static_cast< std::string >( SDL_GetError() );
   }
 
-  if( !screen.loadMedia( &player_texture, &background ) )
+  if( !screen.loadMedia( &player_texture, &background, &enemy_texture ) )
   {
     std::cout << "media failed " << static_cast< std::string >( SDL_GetError() );
 
   }
 
   player.getDimensions( &player_texture );
+  enemies.enemiesDimensions( &enemy_texture );
+
+  enemies.getCoords( &screen );
 
   bool quit = false;
+
+  int step_timer_start = SDL_GetTicks();
 
   SDL_Event event;
 
   while( !quit )
   {
-
     int beginning_of_tick = SDL_GetTicks();
-    int step_timer_start;
 
     int fps = screen.fpsCalc( counted_frames );
     std::cout << fps << std::endl;
@@ -64,9 +70,11 @@ int main( int argc, char* args[] )
 
     player.move( &time_step, &screen );
 
+    enemies.update( player.getPosx(), player.getPosy(), &time_step, &screen );
+
     step_timer_start = SDL_GetTicks();
 
-    screen.renderSeq( &player, &player_texture, &background );
+    screen.renderSeq( &player, &enemies, &player_texture, &background, &enemy_texture);
 
     ++counted_frames;
 
@@ -75,7 +83,6 @@ int main( int argc, char* args[] )
     {
       SDL_Delay( screen.SCREEN_TICKS_PER_FRAME - frame_ticks );
     }
-
   }
 
   screen.close();

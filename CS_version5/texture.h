@@ -1,4 +1,4 @@
-//Johnathan Regha-Dodge: CS_version2/texture.h
+//Johnathan Regha-Dodge: CS_version5/texture.h
 //Texture class
 
 #ifndef TEXTURE_H
@@ -27,7 +27,6 @@ public:
   bool loadFromFile( SDL_Renderer *renderer, const char* path );
 
   void free();
-
   void render( SDL_Renderer *renderer, int x, int y );
 
   int get_width();
